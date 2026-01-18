@@ -1,0 +1,131 @@
+/* ATHENAVAULT THEME */
+body {
+    font-family: 'Cormorant Garamond', serif; /* Classy Body Font */
+    background-color: #0d0d0d; /* Very Dark Grey/Black */
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+    font-size: 18px; /* Slightly larger for elegance */
+}
+
+/* NAVBAR */
+.navbar {
+    background-color: #000000;
+    border-bottom: 1px solid #c5a059;
+    padding: 25px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Cinzel', serif; /* Classy Heading Font */
+    color: #c5a059;
+    font-size: 1.8em;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 2px;
+}
+
+.nav-links a {
+    font-family: 'Cinzel', serif;
+    color: #b0b0b0;
+    text-decoration: none;
+    margin-left: 30px;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #c5a059;
+}
+
+/* DASHBOARD & HEADINGS */
+h1, h2 {
+    font-family: 'Cinzel', serif;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+.card-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.card {
+    background-color: #1a1a1a;
+    width: 260px;
+    padding: 40px 20px;
+    border-radius: 4px; /* Sharper corners are classier */
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    border: 1px solid #333;
+}
+
+.card h2 {
+    font-size: 4em;
+    margin: 0;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif; /* Number style */
+}
+
+.card p {
+    color: #c5a059;
+    margin-top: 10px;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+}
+
+/* TABLES */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1a1a1a;
+    margin-top: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+th {
+    background-color: #252525;
+    color: #c5a059;
+    padding: 20px;
+    text-align: left;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    border-bottom: 2px solid #c5a059;
+}
+
+td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #333;
+    font-size: 1.1em;
+}
+
+/* BUTTONS */
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #c5a059;
+    color: #000;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.9em;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    background-color: #e5c079;
+    letter-spacing: 1px; /* Subtle animation */
+}
+
+/* INPUTS */
+input, select {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1em;
+}

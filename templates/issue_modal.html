@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 50px auto; background: #1e1e1e; padding: 40px; border-radius: 8px; border-top: 4px solid #c5a059; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    
+    <h2 style="text-align: center; color: #c5a059; margin-bottom: 30px; font-family: 'Georgia', serif;">
+        Issue Book
+    </h2>
+    
+    <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
+        
+        <label style="color: #b0b0b0; font-weight: bold;">Student/Borrower Name</label>
+        <input type="text" name="borrower" placeholder="Enter Name..." required 
+               style="padding: 12px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 4px;">
+        
+        <label style="color: #b0b0b0; font-weight: bold;">Issue Duration (Days)</label>
+        <select name="days" style="padding: 12px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 4px;">
+            <option value="7">7 Days</option>
+            <option value="14">14 Days</option>
+            <option value="30">30 Days</option>
+        </select>
+        
+        <button type="submit" class="btn" style="margin-top: 20px; width: 100%; padding: 15px; background-color: #c5a059; color: #000; font-weight: bold; border: none; cursor: pointer;">
+            Confirm Issue
+        </button>
+
+        <a href="{{ url_for('inventory') }}" style="text-align: center; color: #888; text-decoration: none; margin-top: 10px;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

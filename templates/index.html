@@ -1,33 +1,44 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="text-center mb-5">
-    <h1 class="display-4 text-white">Library Overview</h1>
-    <p class="lead" style="color: var(--gold); font-style: italic;">
-        "Knowledge is power."
+<div style="text-align: center; margin-bottom: 60px; margin-top: 20px;">
+    <h1 style="color: #c5a059; font-size: 3.5em; font-family: 'Cinzel', serif; font-weight: 700; margin-bottom: 10px;">
+        AthenaVault Dashboard
+    </h1>
+    <p style="color: #b0b0b0; font-style: italic; font-size: 1.4em; font-family: 'Cormorant Garamond', serif;">
+        "The Guardian of Wisdom"
     </p>
 </div>
 
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card-royal p-4 text-center">
-            <i class="fas fa-book fa-3x mb-3 text-secondary"></i>
-            <h2>{{ total }}</h2>
-            <p>Total Books</p>
-        </div>
+<div class="card-container">
+    
+    <div class="card" style="border-top: 4px solid #4a69bd;"> <h2>{{ total }}</h2>
+        <p>Total Volumes</p>
     </div>
-    <div class="col-md-4">
-        <div class="card-royal p-4 text-center" style="border-bottom: 5px solid var(--gold);">
-            <i class="fas fa-hand-holding fa-3x mb-3" style="color: var(--gold);"></i>
-            <h2>{{ borrowed }}</h2>
-            <p>Currently Borrowed</p>
-        </div>
+
+    <div class="card" style="border-top: 4px solid #c5a059;"> <h2>{{ issued }}</h2>
+        <p>Currently Borrowed</p>
     </div>
-    <div class="col-md-4">
-        <div class="card-royal p-4 text-center" style="border-bottom: 5px solid red;">
-            <i class="fas fa-exclamation-circle fa-3x mb-3 text-danger"></i>
-            <h2>{{ overdue }}</h2>
-            <p>Overdue Books</p>
-        </div>
+
+    <div class="card" style="border-top: 4px solid #e74c3c;"> <h2>{{ overdue }}</h2>
+        <p>Overdue Books</p>
+        
+        {% if fine > 0 %}
+            <p style="color: #ff6b6b; font-weight: bold; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
+                Total Fines: ${{ fine }}
+            </p>
+        {% else %}
+            <p style="color: #2ecc71; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
+                No Outstanding Fines
+            </p>
+        {% endif %}
     </div>
+
+</div>
+
+<div style="text-align: center; margin-top: 70px;">
+    <a href="{{ url_for('inventory') }}" class="btn">
+        📚 Enter Vault & Manage Inventory
+    </a>
 </div>
 {% endblock %}

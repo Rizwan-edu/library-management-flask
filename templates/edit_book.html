@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; background: #1a1a1a; padding: 50px; border-radius: 4px; border-top: 4px solid #c5a059; box-shadow: 0 10px 40px rgba(0,0,0,0.7);">
+    
+    <h2 style="text-align: center; color: #c5a059; margin-bottom: 40px; font-family: 'Cinzel', serif; letter-spacing: 2px; font-weight: 700;">
+        Edit Volume Details
+    </h2>
+    
+    <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label style="color: #c5a059; font-family: 'Cinzel', serif; font-size: 0.9em; font-weight: bold;">Book Title</label>
+            <input type="text" name="title" value="{{ book.title }}" required 
+                   style="padding: 15px; background: #252525; border: 1px solid #444; color: #fff; font-family: 'Cormorant Garamond', serif; font-size: 1.1em; border-radius: 2px;">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label style="color: #c5a059; font-family: 'Cinzel', serif; font-size: 0.9em; font-weight: bold;">Author Name</label>
+            <input type="text" name="author" value="{{ book.author }}" required
+                   style="padding: 15px; background: #252525; border: 1px solid #444; color: #fff; font-family: 'Cormorant Garamond', serif; font-size: 1.1em; border-radius: 2px;">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label style="color: #c5a059; font-family: 'Cinzel', serif; font-size: 0.9em; font-weight: bold;">Category</label>
+            <select name="category" style="padding: 15px; background: #252525; border: 1px solid #444; color: #fff; font-family: 'Cormorant Garamond', serif; font-size: 1.1em; border-radius: 2px;">
+                <option value="Technology" {% if book.category == 'Technology' %}selected{% endif %}>Technology</option>
+                <option value="Fiction" {% if book.category == 'Fiction' %}selected{% endif %}>Fiction</option>
+                <option value="Science" {% if book.category == 'Science' %}selected{% endif %}>Science</option>
+                <option value="History" {% if book.category == 'History' %}selected{% endif %}>History</option>
+                <option value="Biography" {% if book.category == 'Biography' %}selected{% endif %}>Biography</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn" style="margin-top: 20px; width: 100%; cursor: pointer;">
+            Save Changes
+        </button>
+        
+        <a href="{{ url_for('inventory') }}" style="text-align: center; color: #888; text-decoration: none; margin-top: 10px; font-family: 'Cinzel', serif; font-size: 0.8em; letter-spacing: 1px; transition: color 0.3s;">
+            Cancel Operation
+        </a>
+    </form>
+</div>
+
+<style>
+    a:hover { color: #c5a059 !important; }
+</style>
+{% endblock %}

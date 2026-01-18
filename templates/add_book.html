@@ -1,31 +1,36 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card-royal p-5">
-            <h3 class="text-center mb-4">Add to Collection</h3>
-            <form method="POST">
-                <div class="mb-3">
-                    <label class="form-label">Book Title</label>
-                    <input type="text" name="title" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Author</label>
-                    <input type="text" name="author" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Category</label>
-                    <select name="category" class="form-control">
-                        <option>Fiction</option>
-                        <option>Science</option>
-                        <option>History</option>
-                        <option>Technology</option>
-                        <option>Literature</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-gold w-100">Save Record</button>
-            </form>
-        </div>
-    </div>
+<div style="max-width: 600px; margin: 50px auto; background: #1e1e1e; padding: 40px; border-radius: 8px; border-top: 4px solid #c5a059; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    
+    <h2 style="text-align: center; color: #c5a059; margin-bottom: 30px; font-family: 'Georgia', serif;">
+        Add a New Volume
+    </h2>
+    
+    <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
+        
+        <label style="color: #b0b0b0; font-weight: bold;">Book Title</label>
+        <input type="text" name="title" placeholder="e.g. The Great Gatsby" required 
+               style="padding: 12px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 4px;">
+
+        <label style="color: #b0b0b0; font-weight: bold;">Author Name</label>
+        <input type="text" name="author" placeholder="e.g. F. Scott Fitzgerald" required
+               style="padding: 12px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 4px;">
+
+        <label style="color: #b0b0b0; font-weight: bold;">Category</label>
+        <select name="category" style="padding: 12px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 4px;">
+            <option value="Fiction">Fiction</option>
+            <option value="Science">Science</option>
+            <option value="Technology">Technology</option>
+            <option value="History">History</option>
+            <option value="Biography">Biography</option>
+        </select>
+
+        <button type="submit" class="btn" style="margin-top: 20px; width: 100%; padding: 15px; background-color: #c5a059; color: #000; font-weight: bold; border: none; cursor: pointer;">
+            Add to Collection
+        </button>
+        
+        <a href="{{ url_for('inventory') }}" style="text-align: center; color: #888; text-decoration: none; margin-top: 10px;">Cancel</a>
+    </form>
 </div>
 {% endblock %}

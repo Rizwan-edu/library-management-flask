@@ -3,60 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏛️ Royal Library</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --gold: #c5a059;
-            --dark: #1a1a1a;
-            --maroon: #2c0e0e;
-            --paper: #f4f1ea;
-        }
-        body { background-color: var(--dark); color: var(--paper); font-family: 'Lora', serif; }
-        
-        h1, h2, h3, .navbar-brand { font-family: 'Cinzel', serif; letter-spacing: 1px; }
-        
-        .navbar { background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--gold); }
-        .navbar-brand { color: var(--gold) !important; font-weight: bold; }
-        .nav-link { color: #ddd !important; transition: 0.3s; }
-        .nav-link:hover { color: var(--gold) !important; }
-
-        .card-royal {
-            background: var(--paper);
-            color: var(--dark);
-            border: 1px solid var(--gold);
-            border-radius: 5px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        
-        .btn-gold {
-            background: var(--gold);
-            color: var(--dark);
-            border: none;
-            font-family: 'Cinzel', serif;
-            font-weight: bold;
-        }
-        .btn-gold:hover { background: #b08d45; color: white; }
-    </style>
+    <title>AthenaVault Library</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg py-3">
-        <div class="container">
-            <a class="navbar-brand" href="/"><i class="fas fa-book-reader"></i> ROYAL ATHENAEUM</a>
-            <div class="d-flex">
-                <a class="nav-link mx-2" href="/">Dashboard</a>
-                <a class="nav-link mx-2" href="/add">Add Book</a>
-                <a class="nav-link mx-2" href="/books">Inventory</a>
-            </div>
+
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="logo">🏛 ATHENAVAULT</a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">Dashboard</a>
+            <a href="{{ url_for('inventory') }}">Inventory</a>
+            <a href="{{ url_for('issued_books') }}">Issued & Fines</a>
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="alert">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
         {% block content %}{% endblock %}
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,19 +1,18 @@
 from flask import Flask, render_template, request, redirect, url_for
-import os
 import sqlite3
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
-# --- DATABASE CONNECTION ---
 def get_db_connection():
     conn = sqlite3.connect('library.db')
     conn.row_factory = sqlite3.Row
     return conn
 
-# --- INITIALIZE DATABASE ---
+# --- DATABASE SETUP ---
 def init_db():
     conn = get_db_connection()
+    # Create table with ALL columns needed for the project
     conn.execute('''
         CREATE TABLE IF NOT EXISTS books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,109 +20,168 @@ def init_db():
             author TEXT NOT NULL,
             category TEXT,
             status TEXT DEFAULT 'Available',
-            borrower TEXT DEFAULT NULL,
-            due_date TEXT DEFAULT NULL
+            borrower_name TEXT DEFAULT NULL,
+            issue_date DATE DEFAULT NULL,
+            due_date DATE DEFAULT NULL
         )
     ''')
     conn.commit()
     conn.close()
+    seed_data()
 
-init_db()
+def seed_data():
+    conn = get_db_connection()
+    if conn.execute('SELECT count(*) FROM books').fetchone()[0] == 0:
+        # Seeding Initial Data
+        books = [
+            ('Python Crash Course', 'Eric Matthes', 'Technology'),
+            ('Clean Code', 'Robert Martin', 'Technology'),
+            ('The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction'),
+            ('1984', 'George Orwell', 'Fiction'),
+            ('A Brief History of Time', 'Stephen Hawking', 'Science'),
+            ('Sapiens', 'Yuval Noah Harari', 'History')
+        ]
+        conn.executemany('INSERT INTO books (title, author, category) VALUES (?, ?, ?)', books)
+        conn.commit()
+        print("Database seeded with initial books.")
+    conn.close()
 
 # --- ROUTES ---
 
 @app.route('/')
 def index():
+    # DASHBOARD: Shows Statistics
     conn = get_db_connection()
-    # Dashboard Stats
-    total = conn.execute('SELECT COUNT(*) FROM books').fetchone()[0]
-    borrowed = conn.execute("SELECT COUNT(*) FROM books WHERE status='Issued'").fetchone()[0]
-    # Check for Overdue Books
-    overdue = 0
-    today = datetime.now().date()
-    all_borrowed = conn.execute("SELECT * FROM books WHERE status='Issued'").fetchall()
     
-    for book in all_borrowed:
+    total_books = conn.execute('SELECT count(*) FROM books').fetchone()[0]
+    issued_books = conn.execute('SELECT count(*) FROM books WHERE status="Issued"').fetchone()[0]
+    
+    # Calculate Overdue & Fines
+    today = datetime.now().date()
+    overdue_count = 0
+    total_fine = 0
+    issued_list = conn.execute('SELECT * FROM books WHERE status="Issued"').fetchall()
+    
+    for book in issued_list:
         if book['due_date']:
             due = datetime.strptime(book['due_date'], '%Y-%m-%d').date()
-            if today > due:
-                overdue += 1
-                
-    conn.close()
-    return render_template('index.html', total=total, borrowed=borrowed, overdue=overdue)
-
-@app.route('/books')
-def view_books():
-    conn = get_db_connection()
-    books = conn.execute("SELECT * FROM books").fetchall()
-    conn.close()
-    
-    # Calculate Fines for Display
-    books_with_fines = []
-    today = datetime.now().date()
-    
-    for book in books:
-        fine = 0
-        is_overdue = False
-        if book['status'] == 'Issued' and book['due_date']:
-            due = datetime.strptime(book['due_date'], '%Y-%m-%d').date()
-            if today > due:
+            if due < today:
+                overdue_count += 1
                 days_late = (today - due).days
-                fine = days_late * 10  # $10 fine per day
-                is_overdue = True
-        
-        # Convert row to dict to append fine data
-        book_dict = dict(book)
-        book_dict['fine'] = fine
-        book_dict['is_overdue'] = is_overdue
-        books_with_fines.append(book_dict)
+                total_fine += (days_late * 10) # 10 currency units fine per day
 
-    return render_template('books.html', books=books_with_fines)
+    conn.close()
+    
+    return render_template('index.html', 
+                           total=total_books, 
+                           issued=issued_books, 
+                           overdue=overdue_count,
+                           fine=total_fine)
 
-@app.route('/add', methods=['GET', 'POST'])
+@app.route('/inventory')
+def inventory():
+    conn = get_db_connection()
+    books = conn.execute('SELECT * FROM books').fetchall()
+    conn.close()
+    return render_template('inventory.html', books=books)
+
+@app.route('/add_book', methods=('GET', 'POST'))
 def add_book():
     if request.method == 'POST':
         title = request.form['title']
         author = request.form['author']
         category = request.form['category']
-        
         conn = get_db_connection()
-        conn.execute("INSERT INTO books (title, author, category) VALUES (?, ?, ?)", 
-                     (title, author, category))
+        conn.execute('INSERT INTO books (title, author, category) VALUES (?, ?, ?)', (title, author, category))
         conn.commit()
         conn.close()
-        return redirect(url_for('view_books'))
+        return redirect(url_for('inventory'))
     return render_template('add_book.html')
 
-@app.route('/issue/<int:id>', methods=['POST'])
-def issue_book(id):
-    student_name = request.form['student_name']
-    # Set Due Date to 7 days from now
-    due_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+# --- NEW: EDIT & DELETE ROUTES ---
+
+@app.route('/edit/<int:book_id>', methods=('GET', 'POST'))
+def edit_book(book_id):
+    conn = get_db_connection()
+    book = conn.execute('SELECT * FROM books WHERE id = ?', (book_id,)).fetchone()
+
+    if request.method == 'POST':
+        title = request.form['title']
+        author = request.form['author']
+        category = request.form['category']
+        
+        conn.execute('UPDATE books SET title = ?, author = ?, category = ? WHERE id = ?',
+                     (title, author, category, book_id))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('inventory'))
+
+    conn.close()
+    return render_template('edit_book.html', book=book)
+
+@app.route('/delete/<int:book_id>')
+def delete_book(book_id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM books WHERE id = ?', (book_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('inventory'))
+
+# --- ISSUE & RETURN ROUTES ---
+
+@app.route('/issue/<int:book_id>', methods=('GET', 'POST'))
+def issue_book(book_id):
+    if request.method == 'POST':
+        borrower = request.form['borrower']
+        days = int(request.form['days'])
+        
+        issue_date = datetime.now()
+        due_date = issue_date + timedelta(days=days)
+        
+        conn = get_db_connection()
+        conn.execute('UPDATE books SET status="Issued", borrower_name=?, issue_date=?, due_date=? WHERE id=?',
+                     (borrower, issue_date.strftime('%Y-%m-%d'), due_date.strftime('%Y-%m-%d'), book_id))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('inventory'))
+        
+    return render_template('issue_modal.html', book_id=book_id)
+
+@app.route('/issued_books')
+def issued_books():
+    conn = get_db_connection()
+    books = conn.execute('SELECT * FROM books WHERE status="Issued"').fetchall()
+    conn.close()
     
-    conn = get_db_connection()
-    conn.execute("UPDATE books SET status='Issued', borrower=?, due_date=? WHERE id=?", 
-                 (student_name, due_date, id))
-    conn.commit()
-    conn.close()
-    return redirect(url_for('view_books'))
+    book_list = []
+    today = datetime.now().date()
+    
+    for book in books:
+        if book['due_date']:
+            due_date = datetime.strptime(book['due_date'], '%Y-%m-%d').date()
+            days_overdue = (today - due_date).days
+            fine = max(0, days_overdue * 10)
+            
+            book_list.append({
+                'id': book['id'],
+                'title': book['title'],
+                'borrower': book['borrower_name'],
+                'due_date': book['due_date'],
+                'fine': fine
+            })
+        
+    return render_template('issued_books.html', books=book_list)
 
-@app.route('/return/<int:id>')
-def return_book(id):
+@app.route('/return/<int:book_id>')
+def return_book(book_id):
     conn = get_db_connection()
-    conn.execute("UPDATE books SET status='Available', borrower=NULL, due_date=NULL WHERE id=?", (id,))
+    conn.execute('UPDATE books SET status="Available", borrower_name=NULL, issue_date=NULL, due_date=NULL WHERE id=?', (book_id,))
     conn.commit()
     conn.close()
-    return redirect(url_for('view_books'))
+    return redirect(url_for('issued_books'))
 
-@app.route('/delete/<int:id>')
-def delete_book(id):
-    conn = get_db_connection()
-    conn.execute("DELETE FROM books WHERE id=?", (id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for('view_books'))
+# --- APP STARTUP ---
+init_db()
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)
