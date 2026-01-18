@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card-royal p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="m-0"><i class="fas fa-scroll"></i> Collection Registry</h2>
+        <a href="/add" class="btn btn-gold"><i class="fas fa-plus"></i> New Entry</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th style="width: 5%">ID</th>
+                    <th style="width: 25%">Book Details</th>
+                    <th style="width: 15%">Status</th>
+                    <th style="width: 20%">Current Borrower</th>
+                    <th style="width: 15%">Due Date / Fine</th>
+                    <th style="width: 20%">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>{{ book.id }}</td>
+                    <td>
+                        <strong>{{ book.title }}</strong><br>
+                        <small class="text-muted">{{ book.author }}</small>
+                    </td>
+                    <td>
+                        {% if book.status == 'Available' %}
+                            <span class="badge bg-success rounded-pill">IN STOCK</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark rounded-pill">CHECKED OUT</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if book.borrower %}
+                            <i class="fas fa-user-circle"></i> {{ book.borrower }}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if book.due_date %}
+                            {{ book.due_date }}
+                            {% if book.is_overdue %}
+                                <div class="mt-1">
+                                    <span class="badge bg-danger animate__animated animate__pulse infinite">
+                                        FINE: ${{ book.fine }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if book.status == 'Available' %}
+                            <button type="button" class="btn btn-sm btn-gold" data-bs-toggle="modal" data-bs-target="#issueModal{{ book.id }}">
+                                <i class="fas fa-hand-holding"></i> Issue
+                            </button>
+
+                            <div class="modal fade" id="issueModal{{ book.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-dark">Issue Book</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form action="/issue/{{ book.id }}" method="POST">
+                                            <div class="modal-body text-dark">
+                                                <p><strong>Book:</strong> {{ book.title }}</p>
+                                                <label class="form-label">Student Name:</label>
+                                                <input type="text" name="student_name" class="form-control" placeholder="Enter student name..." required>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-gold">Confirm Issue</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% else %}
+                            <a href="/return/{{ book.id }}" class="btn btn-sm btn-outline-dark">
+                                <i class="fas fa-undo"></i> Return
+                            </a>
+                        {% endif %}
+                        <a href="/delete/{{ book.id }}" class="btn btn-sm btn-danger ms-1" onclick="return confirm('Remove this book from library?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
