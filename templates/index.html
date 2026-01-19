@@ -5,24 +5,22 @@
 
 <div style="text-align: center; margin-bottom: 40px; margin-top: 20px; position: relative;">
     
-    <div style="position: absolute; top: 0; right: 0;">
-        <a href="/?lang=en" style="text-decoration: none; font-size: 1.5em; opacity: {{ '1' if lang == 'en' else '0.5' }};" title="English">🇬🇧</a>
-        <a href="/?lang=es" style="text-decoration: none; font-size: 1.5em; opacity: {{ '1' if lang == 'es' else '0.5' }};" title="Spanish">🇪🇸</a>
-    </div>
-
     <h1 style="color: #c5a059; font-size: 3.5em; font-family: 'Cinzel', serif; font-weight: 700;">
-        {{ t.title }}
+        LibraCore Dashboard
     </h1>
     <p style="color: #b0b0b0; font-style: italic; font-size: 1.4em; font-family: 'Cormorant Garamond', serif;">
-        {{ t.slogan }}
+        "The Central Hub of Knowledge"
     </p>
 
     <div style="margin-top: 30px;">
         <input type="text" id="voiceInput" placeholder="Click mic to search..." 
                style="padding: 10px; width: 300px; border-radius: 20px; border: 1px solid #c5a059; background: #1a1a1a; color: white; text-align: center;">
-        <button onclick="startVoiceSearch()" style="background: none; border: none; cursor: pointer; font-size: 1.5em; vertical-align: middle;">
-            🎤
-        </button>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mic-icon" onclick="startVoiceSearch()">
+          <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
+          <path d="M6 10.5a.75.75 0 01.75.75v1.5a5.25 5.25 0 1010.5 0v-1.5a.75.75 0 011.5 0v1.5c0 2.9-2.354 5.25-5.25 5.25v3h3a.75.75 0 010 1.5h-9a.75.75 0 010-1.5h3v-3c-2.896 0-5.25-2.35-5.25-5.25v-1.5a.75.75 0 01.75-.75z" />
+        </svg>
+
         <button onclick="window.location.href='/inventory?q=' + document.getElementById('voiceInput').value" 
                 style="background: #c5a059; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 5px;">
             Go
@@ -33,20 +31,20 @@
 <div class="card-container" style="margin-bottom: 50px;">
     <div class="card" style="border-top: 4px solid #4a69bd;">
         <h2>{{ total }}</h2>
-        <p>{{ t.total }}</p>
+        <p>Total Volumes</p>
     </div>
 
     <div class="card" style="border-top: 4px solid #c5a059;">
         <h2>{{ issued }}</h2>
-        <p>{{ t.borrowed }}</p>
+        <p>Currently Borrowed</p>
     </div>
 
     <div class="card" style="border-top: 4px solid #e74c3c;">
         <h2>{{ overdue }}</h2>
-        <p>{{ t.overdue }}</p>
+        <p>Overdue Books</p>
         {% if fine > 0 %}
             <p style="color: #ff6b6b; font-weight: bold; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
-                {{ t.fines }}: ${{ fine }}
+                Total Fines: ${{ fine }}
             </p>
         {% else %}
              <p style="color: #2ecc71; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
@@ -72,7 +70,7 @@
 
 <div style="text-align: center; margin-top: 40px;">
     <a href="{{ url_for('inventory') }}" class="btn">
-        {{ t.btn }}
+        📚 Enter Vault & Manage Inventory
     </a>
 </div>
 
@@ -98,7 +96,7 @@
 </script>
 
 <script>
-    // 1. Category Chart Data
+    // 1. Category Chart
     const catCtx = document.getElementById('categoryChart').getContext('2d');
     new Chart(catCtx, {
         type: 'doughnut',
@@ -120,7 +118,7 @@
         }
     });
 
-    // 2. Status Chart Data
+    // 2. Status Chart
     const statCtx = document.getElementById('statusChart').getContext('2d');
     new Chart(statCtx, {
         type: 'bar',

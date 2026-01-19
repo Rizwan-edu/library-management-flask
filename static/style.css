@@ -52,7 +52,7 @@ body {
     color: #c5a059;
 }
 
-/* --- ROLE SWITCHER (NEW) --- */
+/* --- ROLE SWITCHER --- */
 .role-switch {
     display: flex;
     align-items: center;
@@ -73,18 +73,33 @@ body {
     font-weight: bold;
 }
 
-/* --- HIDING LOGIC FOR STUDENT MODE --- */
-/* When body has class 'student-mode', hide elements with 'admin-only' class */
+/* --- STUDENT MODE HIDING LOGIC --- */
 body.student-mode .admin-only {
     display: none !important;
 }
 
-/* Change switch color when in Student Mode */
 body.student-mode .role-switch {
     background: #c5a059;
 }
 body.student-mode .role-switch .role-label {
     color: #000;
+}
+
+/* --- MIC ICON STYLES --- */
+.mic-icon {
+    width: 28px;
+    height: 28px;
+    color: #c5a059;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-left: 10px;
+    margin-right: 5px;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.mic-icon:hover {
+    color: #e5c079;
+    transform: scale(1.1);
 }
 
 /* --- DASHBOARD & HEADINGS --- */

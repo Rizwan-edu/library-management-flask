@@ -32,7 +32,7 @@ def seed_data():
     with get_db_connection() as conn:
         if conn.execute('SELECT count(*) FROM books').fetchone()[0] == 0:
             books = [
-                # --- TECHNOLOGY & CODING ---
+                # --- TECHNOLOGY ---
                 ('Python Crash Course', 'Eric Matthes', 'Technology'),
                 ('Clean Code', 'Robert Martin', 'Technology'),
                 ('The Pragmatic Programmer', 'Andrew Hunt', 'Technology'),
@@ -48,12 +48,7 @@ def seed_data():
                 ('Deep Learning', 'Ian Goodfellow', 'Technology'),
                 ('Automate the Boring Stuff with Python', 'Al Sweigart', 'Technology'),
                 ('Fluent Python', 'Luciano Ramalho', 'Technology'),
-                ('The Linux Command Line', 'William Shotts', 'Technology'),
-                ('Pro Git', 'Scott Chacon', 'Technology'),
-                ('Effective Java', 'Joshua Bloch', 'Technology'),
-                ('Rust Programming Language', 'Steve Klabnik', 'Technology'),
-                ('Grokking Algorithms', 'Aditya Bhargava', 'Technology'),
-
+                
                 # --- FICTION & CLASSICS ---
                 ('The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction'),
                 ('1984', 'George Orwell', 'Fiction'),
@@ -80,11 +75,7 @@ def seed_data():
                 ('Ulysses', 'James Joyce', 'Classic'),
                 ('One Hundred Years of Solitude', 'Gabriel Garcia Marquez', 'Fiction'),
                 ('The Great Expectations', 'Charles Dickens', 'Classic'),
-                ('Frankenstein', 'Mary Shelley', 'Classic'),
-                ('Dracula', 'Bram Stoker', 'Classic'),
-                ('The Picture of Dorian Gray', 'Oscar Wilde', 'Classic'),
-                ('Les Misérables', 'Victor Hugo', 'Classic'),
-                
+
                 # --- FANTASY & SCI-FI ---
                 ('Harry Potter and the Sorcerer\'s Stone', 'J.K. Rowling', 'Fantasy'),
                 ('Harry Potter and the Chamber of Secrets', 'J.K. Rowling', 'Fantasy'),
@@ -106,8 +97,7 @@ def seed_data():
                 ('Ready Player One', 'Ernest Cline', 'Sci-Fi'),
                 ('The Martian', 'Andy Weir', 'Sci-Fi'),
                 ('Foundation', 'Isaac Asimov', 'Sci-Fi'),
-                ('Neuromancer', 'William Gibson', 'Sci-Fi'),
-
+                
                 # --- MYSTERY & THRILLER ---
                 ('The Da Vinci Code', 'Dan Brown', 'Thriller'),
                 ('Angels & Demons', 'Dan Brown', 'Thriller'),
@@ -119,31 +109,7 @@ def seed_data():
                 ('The Silent Patient', 'Alex Michaelides', 'Thriller'),
                 ('The Woman in the Window', 'A.J. Finn', 'Thriller'),
                 ('Big Little Lies', 'Liane Moriarty', 'Mystery'),
-
-                # --- BUSINESS & ECONOMICS ---
-                ('Rich Dad Poor Dad', 'Robert Kiyosaki', 'Business'),
-                ('Think and Grow Rich', 'Napoleon Hill', 'Business'),
-                ('Zero to One', 'Peter Thiel', 'Business'),
-                ('The Lean Startup', 'Eric Ries', 'Business'),
-                ('Good to Great', 'Jim Collins', 'Business'),
-                ('Freakonomics', 'Steven Levitt', 'Economics'),
-                ('Thinking, Fast and Slow', 'Daniel Kahneman', 'Psychology'),
-                ('The Intelligent Investor', 'Benjamin Graham', 'Business'),
-                ('Principles', 'Ray Dalio', 'Business'),
-                ('Shoe Dog', 'Phil Knight', 'Biography'),
-
-                # --- HISTORY & SCIENCE ---
-                ('Sapiens: A Brief History of Humankind', 'Yuval Noah Harari', 'History'),
-                ('Homo Deus', 'Yuval Noah Harari', 'History'),
-                ('A Brief History of Time', 'Stephen Hawking', 'Science'),
-                ('Cosmos', 'Carl Sagan', 'Science'),
-                ('The Selfish Gene', 'Richard Dawkins', 'Science'),
-                ('Guns, Germs, and Steel', 'Jared Diamond', 'History'),
-                ('The Silk Roads', 'Peter Frankopan', 'History'),
-                ('1491', 'Charles C. Mann', 'History'),
-                ('Astrophysics for People in a Hurry', 'Neil deGrasse Tyson', 'Science'),
-                ('Silent Spring', 'Rachel Carson', 'Science'),
-
+                
                 # --- BIOGRAPHY & SELF-HELP ---
                 ('Steve Jobs', 'Walter Isaacson', 'Biography'),
                 ('Elon Musk', 'Ashlee Vance', 'Biography'),
@@ -160,17 +126,22 @@ def seed_data():
                 ('Can\'t Hurt Me', 'David Goggins', 'Self-Help'),
                 ('Educated', 'Tara Westover', 'Biography'),
                 ('The Subtle Art of Not Giving a F*ck', 'Mark Manson', 'Self-Help'),
-                
-                # --- COOKING & ART ---
-                ('Salt, Fat, Acid, Heat', 'Samin Nosrat', 'Cooking'),
-                ('The Joy of Cooking', 'Irma S. Rombauer', 'Cooking'),
-                ('Kitchen Confidential', 'Anthony Bourdain', 'Cooking'),
-                ('The Story of Art', 'E.H. Gombrich', 'Art'),
-                ('Ways of Seeing', 'John Berger', 'Art')
+
+                 # --- HISTORY & SCIENCE ---
+                ('Sapiens: A Brief History of Humankind', 'Yuval Noah Harari', 'History'),
+                ('Homo Deus', 'Yuval Noah Harari', 'History'),
+                ('A Brief History of Time', 'Stephen Hawking', 'Science'),
+                ('Cosmos', 'Carl Sagan', 'Science'),
+                ('The Selfish Gene', 'Richard Dawkins', 'Science'),
+                ('Guns, Germs, and Steel', 'Jared Diamond', 'History'),
+                ('The Silk Roads', 'Peter Frankopan', 'History'),
+                ('1491', 'Charles C. Mann', 'History'),
+                ('Astrophysics for People in a Hurry', 'Neil deGrasse Tyson', 'Science'),
+                ('Silent Spring', 'Rachel Carson', 'Science'),
             ]
             conn.executemany('INSERT INTO books (title, author, category) VALUES (?, ?, ?)', books)
             conn.commit()
-            print("LibraCore Database seeded with 150+ Books.")
+            print("LibraCore Database seeded with 100+ Books.")
 
 # --- ROUTES ---
 
@@ -180,7 +151,7 @@ def index():
         # 1. Fetch Basic Stats
         total = conn.execute('SELECT count(*) FROM books').fetchone()[0]
         issued = conn.execute('SELECT count(*) FROM books WHERE status="Issued"').fetchone()[0]
-        available = total - issued # Calculated field
+        available = total - issued 
         
         # 2. Overdue Logic
         issued_list = conn.execute('SELECT * FROM books WHERE status="Issued"').fetchall()
@@ -201,28 +172,19 @@ def index():
         chart_labels = [row['category'] for row in cat_data]
         chart_values = [row['count'] for row in cat_data]
 
-    # Language Dictionary
-    lang = request.args.get('lang', 'en')
-    text = {
-        'en': { 'title': 'LibraCore Dashboard', 'slogan': '"The Central Hub of Knowledge"', 'total': 'Total Volumes', 'borrowed': 'Currently Borrowed', 'overdue': 'Overdue Books', 'fines': 'Total Fines', 'btn': '📚 Enter Vault & Manage Inventory' },
-        'es': { 'title': 'Tablero LibraCore', 'slogan': '"El Centro del Conocimiento"', 'total': 'Volúmenes Totales', 'borrowed': 'Actualmente Prestados', 'overdue': 'Libros Vencidos', 'fines': 'Multas Totales', 'btn': '📚 Entrar y Gestionar Inventario' }
-    }
-    
+    # No language logic needed anymore
     return render_template('index.html', 
                            total=total, issued=issued, available=available, overdue=overdue, fine=fine, 
-                           t=text[lang], lang=lang,
                            chart_labels=chart_labels, chart_values=chart_values)
 
 @app.route('/inventory')
 def inventory():
-    # 1. Get Filters from URL
     search_query = request.args.get('q', '')
     sort_by = request.args.get('sort', 'title')
     category_filter = request.args.get('category', '')
     status_filter = request.args.get('status', '')
 
     with get_db_connection() as conn:
-        # 2. Build Dynamic SQL
         sql_query = 'SELECT * FROM books WHERE 1=1'
         params = []
 
@@ -238,14 +200,12 @@ def inventory():
             sql_query += ' AND status = ?'
             params.append(status_filter)
 
-        # 3. Sorting Whitelist
         valid_sorts = {'title': 'title', 'author': 'author', 'category': 'category', 'status': 'status'}
         sort_column = valid_sorts.get(sort_by, 'title')
         sql_query += f' ORDER BY {sort_column}'
 
         books = conn.execute(sql_query, params).fetchall()
 
-        # 4. Get Categories for Dropdown
         categories_data = conn.execute('SELECT DISTINCT category FROM books ORDER BY category').fetchall()
         categories = [row['category'] for row in categories_data]
 
@@ -326,5 +286,4 @@ def return_book(book_id):
 init_db()
 
 if __name__ == '__main__':
-    # SECURITY FIX: Debug mode disabled for production simulation
     app.run(debug=False)
