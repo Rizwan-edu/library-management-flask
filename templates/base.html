@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LibraCore Library System</title> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>LibraCore Library System</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-
-    <nav class="navbar">
+<body class="admin-mode"> <nav class="navbar">
         <a href="{{ url_for('index') }}" class="logo">🏛 LIBRACORE</a>
+        
         <div class="nav-links">
             <a href="{{ url_for('index') }}">Dashboard</a>
             <a href="{{ url_for('inventory') }}">Inventory</a>
             <a href="{{ url_for('issued_books') }}">Issued & Fines</a>
+
+            <div class="role-switch" onclick="toggleRole()">
+                <span class="role-label" id="roleText">👤 View: ADMIN</span>
+            </div>
         </div>
     </nav>
 
@@ -33,6 +38,23 @@
         
         {% block content %}{% endblock %}
     </div>
+
+    <script>
+        function toggleRole() {
+            const body = document.body;
+            const text = document.getElementById('roleText');
+            
+            // Toggle the class 'student-mode' on the body
+            body.classList.toggle('student-mode');
+            
+            // Update the button text
+            if (body.classList.contains('student-mode')) {
+                text.innerText = "🎓 View: STUDENT";
+            } else {
+                text.innerText = "👤 View: ADMIN";
+            }
+        }
+    </script>
 
 </body>
 </html>

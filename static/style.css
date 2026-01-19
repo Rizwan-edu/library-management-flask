@@ -2,12 +2,12 @@
    ATHENAVAULT MASTER THEME (Dark Royal)
    ========================================= */
 
-/* IMPORT FONTS (Cinzel & Cormorant Garamond) */
+/* IMPORT FONTS */
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap');
 
 body {
-    font-family: 'Cormorant Garamond', serif; /* Classy Body Font */
-    background-color: #0d0d0d; /* Very Dark Grey/Black */
+    font-family: 'Cormorant Garamond', serif;
+    background-color: #0d0d0d;
     color: #e0e0e0;
     margin: 0;
     padding: 0;
@@ -33,6 +33,11 @@ body {
     letter-spacing: 2px;
 }
 
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
 .nav-links a {
     font-family: 'Cinzel', serif;
     color: #b0b0b0;
@@ -47,8 +52,43 @@ body {
     color: #c5a059;
 }
 
+/* --- ROLE SWITCHER (NEW) --- */
+.role-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #1a1a1a;
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 1px solid #c5a059;
+    cursor: pointer;
+    margin-left: 20px;
+    transition: all 0.3s ease;
+}
+
+.role-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8em;
+    color: #c5a059;
+    font-weight: bold;
+}
+
+/* --- HIDING LOGIC FOR STUDENT MODE --- */
+/* When body has class 'student-mode', hide elements with 'admin-only' class */
+body.student-mode .admin-only {
+    display: none !important;
+}
+
+/* Change switch color when in Student Mode */
+body.student-mode .role-switch {
+    background: #c5a059;
+}
+body.student-mode .role-switch .role-label {
+    color: #000;
+}
+
 /* --- DASHBOARD & HEADINGS --- */
-h1, h2 {
+h1, h2, h3 {
     font-family: 'Cinzel', serif;
     font-weight: 400;
     letter-spacing: 1px;
@@ -139,29 +179,24 @@ input, select {
 }
 
 /* =========================================
-   MOBILE RESPONSIVENESS (The Phone Fix) 
+   MOBILE RESPONSIVENESS (Phone Fix) 
    ========================================= */
 @media (max-width: 768px) {
-
-    /* 1. Stack the Navbar */
     .navbar {
         flex-direction: column;
         padding: 15px;
         text-align: center;
     }
-
     .navbar .logo {
         font-size: 1.5em;
         margin-bottom: 10px;
     }
-
     .nav-links {
         display: flex;
         flex-direction: column;
         gap: 10px;
         width: 100%;
     }
-
     .nav-links a {
         margin-left: 0;
         font-size: 0.9em;
@@ -170,43 +205,35 @@ input, select {
         border-radius: 4px;
         display: block;
     }
-
-    /* 2. Fix Big Headings */
+    .role-switch {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        justify-content: center;
+    }
     h1 {
         font-size: 2em !important;
         line-height: 1.2;
     }
-    
-    p {
-        font-size: 1em !important;
-    }
-
-    /* 3. Stack Dashboard Cards */
     .card-container {
         flex-direction: column;
         align-items: center;
         gap: 20px;
     }
-
     .card {
         width: 90%;
         margin-bottom: 10px;
     }
-
-    /* 4. Fix Forms (Add/Edit) */
     .container {
         padding: 10px;
         width: 95%;
     }
-    
     div[style*="max-width: 600px"], 
     div[style*="max-width: 500px"] {
         padding: 20px !important;
         width: 100% !important;
         box-sizing: border-box;
     }
-    
-    /* 5. Fix Tables (Scrollable) */
     table {
         display: block;
         overflow-x: auto;

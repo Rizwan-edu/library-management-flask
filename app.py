@@ -177,58 +177,80 @@ def seed_data():
 @app.route('/')
 def index():
     with get_db_connection() as conn:
-        # Fetch Stats
+        # 1. Fetch Basic Stats
         total = conn.execute('SELECT count(*) FROM books').fetchone()[0]
         issued = conn.execute('SELECT count(*) FROM books WHERE status="Issued"').fetchone()[0]
+        available = total - issued # Calculated field
+        
+        # 2. Overdue Logic
         issued_list = conn.execute('SELECT * FROM books WHERE status="Issued"').fetchall()
-    
-    # Calculate Logic
-    today = datetime.now().date()
-    overdue = 0
-    fine = 0
-    
-    for book in issued_list:
-        if book['due_date']:
-            due = datetime.strptime(book['due_date'], '%Y-%m-%d').date()
-            if due < today:
-                overdue += 1
-                days = (today - due).days
-                fine += (days * 10)
+        today = datetime.now().date()
+        overdue = 0
+        fine = 0
+        
+        for book in issued_list:
+            if book['due_date']:
+                due = datetime.strptime(book['due_date'], '%Y-%m-%d').date()
+                if due < today:
+                    overdue += 1
+                    days = (today - due).days
+                    fine += (days * 10)
 
-    # Translations
+        # 3. Chart Data Analytics (Group by Category)
+        cat_data = conn.execute('SELECT category, COUNT(*) as count FROM books GROUP BY category').fetchall()
+        chart_labels = [row['category'] for row in cat_data]
+        chart_values = [row['count'] for row in cat_data]
+
+    # Language Dictionary
     lang = request.args.get('lang', 'en')
     text = {
-        'en': { 
-            'title': 'LibraCore Dashboard', 
-            'slogan': '"The Central Hub of Knowledge"', 
-            'total': 'Total Volumes', 
-            'borrowed': 'Currently Borrowed', 
-            'overdue': 'Overdue Books', 
-            'fines': 'Total Fines', 
-            'btn': '📚 Enter Vault & Manage Inventory' 
-        },
-        'es': { 
-            'title': 'Tablero LibraCore', 
-            'slogan': '"El Centro del Conocimiento"', 
-            'total': 'Volúmenes Totales', 
-            'borrowed': 'Actualmente Prestados', 
-            'overdue': 'Libros Vencidos', 
-            'fines': 'Multas Totales', 
-            'btn': '📚 Entrar y Gestionar Inventario' 
-        }
+        'en': { 'title': 'LibraCore Dashboard', 'slogan': '"The Central Hub of Knowledge"', 'total': 'Total Volumes', 'borrowed': 'Currently Borrowed', 'overdue': 'Overdue Books', 'fines': 'Total Fines', 'btn': '📚 Enter Vault & Manage Inventory' },
+        'es': { 'title': 'Tablero LibraCore', 'slogan': '"El Centro del Conocimiento"', 'total': 'Volúmenes Totales', 'borrowed': 'Actualmente Prestados', 'overdue': 'Libros Vencidos', 'fines': 'Multas Totales', 'btn': '📚 Entrar y Gestionar Inventario' }
     }
     
-    return render_template('index.html', total=total, issued=issued, overdue=overdue, fine=fine, t=text[lang], lang=lang)
+    return render_template('index.html', 
+                           total=total, issued=issued, available=available, overdue=overdue, fine=fine, 
+                           t=text[lang], lang=lang,
+                           chart_labels=chart_labels, chart_values=chart_values)
 
 @app.route('/inventory')
 def inventory():
+    # 1. Get Filters from URL
     search_query = request.args.get('q', '')
+    sort_by = request.args.get('sort', 'title')
+    category_filter = request.args.get('category', '')
+    status_filter = request.args.get('status', '')
+
     with get_db_connection() as conn:
+        # 2. Build Dynamic SQL
+        sql_query = 'SELECT * FROM books WHERE 1=1'
+        params = []
+
         if search_query:
-            books = conn.execute('SELECT * FROM books WHERE title LIKE ? OR author LIKE ?', ('%' + search_query + '%', '%' + search_query + '%')).fetchall()
-        else:
-            books = conn.execute('SELECT * FROM books').fetchall()
-    return render_template('inventory.html', books=books)
+            sql_query += ' AND (title LIKE ? OR author LIKE ?)'
+            params.extend(['%' + search_query + '%', '%' + search_query + '%'])
+
+        if category_filter:
+            sql_query += ' AND category = ?'
+            params.append(category_filter)
+        
+        if status_filter:
+            sql_query += ' AND status = ?'
+            params.append(status_filter)
+
+        # 3. Sorting Whitelist
+        valid_sorts = {'title': 'title', 'author': 'author', 'category': 'category', 'status': 'status'}
+        sort_column = valid_sorts.get(sort_by, 'title')
+        sql_query += f' ORDER BY {sort_column}'
+
+        books = conn.execute(sql_query, params).fetchall()
+
+        # 4. Get Categories for Dropdown
+        categories_data = conn.execute('SELECT DISTINCT category FROM books ORDER BY category').fetchall()
+        categories = [row['category'] for row in categories_data]
+
+    return render_template('inventory.html', books=books, categories=categories, 
+                           current_sort=sort_by, current_cat=category_filter, current_stat=status_filter, current_q=search_query)
 
 @app.route('/add_book', methods=('GET', 'POST'))
 def add_book():
@@ -244,13 +266,11 @@ def add_book():
 def edit_book(book_id):
     with get_db_connection() as conn:
         book = conn.execute('SELECT * FROM books WHERE id = ?', (book_id,)).fetchone()
-        
         if request.method == 'POST':
             conn.execute('UPDATE books SET title = ?, author = ?, category = ? WHERE id = ?', 
                          (request.form['title'], request.form['author'], request.form['category'], book_id))
             conn.commit()
             return redirect(url_for('inventory'))
-            
     return render_template('edit_book.html', book=book)
 
 @app.route('/delete/<int:book_id>')
@@ -267,7 +287,6 @@ def issue_book(book_id):
         days = int(request.form['days'])
         issue_date = datetime.now()
         due_date = issue_date + timedelta(days=days)
-        
         with get_db_connection() as conn:
             conn.execute('UPDATE books SET status="Issued", borrower_name=?, issue_date=?, due_date=? WHERE id=?',
                          (borrower, issue_date.strftime('%Y-%m-%d'), due_date.strftime('%Y-%m-%d'), book_id))
@@ -279,16 +298,13 @@ def issue_book(book_id):
 def issued_books():
     book_list = []
     today = datetime.now().date()
-    
     with get_db_connection() as conn:
         books = conn.execute('SELECT * FROM books WHERE status="Issued"').fetchall()
-        
         for book in books:
             if book['due_date']:
                 due_date = datetime.strptime(book['due_date'], '%Y-%m-%d').date()
                 days_overdue = (today - due_date).days
                 fine = max(0, days_overdue * 10)
-                
                 book_list.append({
                     'id': book['id'],
                     'title': book['title'],

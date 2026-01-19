@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <div style="text-align: center; margin-bottom: 40px; margin-top: 20px; position: relative;">
     
     <div style="position: absolute; top: 0; right: 0;">
@@ -28,7 +30,7 @@
     </div>
 </div>
 
-<div class="card-container">
+<div class="card-container" style="margin-bottom: 50px;">
     <div class="card" style="border-top: 4px solid #4a69bd;">
         <h2>{{ total }}</h2>
         <p>{{ t.total }}</p>
@@ -54,7 +56,21 @@
     </div>
 </div>
 
-<div style="text-align: center; margin-top: 70px;">
+<div class="admin-only" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; margin-bottom: 50px;">
+    
+    <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #333; width: 400px;">
+        <h3 style="color: #c5a059; text-align: center; font-family: 'Cinzel', serif; margin-bottom: 20px;">Library Composition</h3>
+        <canvas id="categoryChart"></canvas>
+    </div>
+
+    <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #333; width: 400px;">
+        <h3 style="color: #c5a059; text-align: center; font-family: 'Cinzel', serif; margin-bottom: 20px;">Inventory Status</h3>
+        <canvas id="statusChart"></canvas>
+    </div>
+
+</div>
+
+<div style="text-align: center; margin-top: 40px;">
     <a href="{{ url_for('inventory') }}" class="btn">
         {{ t.btn }}
     </a>
@@ -66,22 +82,65 @@
             alert("Sorry, your browser doesn't support Voice Search. Try Chrome!");
             return;
         }
-
         var recognition = new webkitSpeechRecognition();
         recognition.lang = "en-US";
         recognition.start();
-
         document.getElementById("voiceInput").placeholder = "Listening...";
-
         recognition.onresult = function(event) {
             var transcript = event.results[0][0].transcript;
             document.getElementById("voiceInput").value = transcript;
             window.location.href = '/inventory?q=' + transcript;
         };
-
         recognition.onerror = function(event) {
-            document.getElementById("voiceInput").placeholder = "Error. Try again.";
+             document.getElementById("voiceInput").placeholder = "Error. Try again.";
         };
     }
+</script>
+
+<script>
+    // 1. Category Chart Data
+    const catCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(catCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ chart_labels | tojson }},
+            datasets: [{
+                data: {{ chart_values | tojson }},
+                backgroundColor: [
+                    '#c5a059', '#4a69bd', '#e74c3c', '#2ecc71', '#9b59b6', '#f1c40f', '#34495e', '#ecf0f1', '#e67e22'
+                ],
+                borderColor: '#0d0d0d',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { labels: { color: '#ccc', font: {family: 'Cinzel'} } }
+            }
+        }
+    });
+
+    // 2. Status Chart Data
+    const statCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Available Books', 'Issued Books'],
+            datasets: [{
+                label: 'Count',
+                data: [{{ available }}, {{ issued }}],
+                backgroundColor: ['#2ecc71', '#c0392b'],
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#333' }, ticks: { color: '#ccc' } },
+                x: { grid: { display: false }, ticks: { color: '#ccc', font: {family: 'Cinzel'} } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
 </script>
 {% endblock %}

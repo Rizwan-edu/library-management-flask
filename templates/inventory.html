@@ -3,8 +3,37 @@
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h1 style="color: #c5a059; font-family: 'Cinzel', serif;">Library Inventory</h1>
-    <a href="{{ url_for('add_book') }}" class="btn">＋ Add New Volume</a>
+    
+    <a href="{{ url_for('add_book') }}" class="btn admin-only">＋ Add New Volume</a>
 </div>
+
+<form action="{{ url_for('inventory') }}" method="GET" 
+      style="background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333; margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+    
+    <input type="text" name="q" placeholder="Search Title or Author..." value="{{ current_q }}"
+           style="padding: 10px; border-radius: 4px; border: 1px solid #c5a059; background: #000; color: #fff; flex: 2; min-width: 200px;">
+
+    <select name="category" style="padding: 10px; border-radius: 4px; border: 1px solid #c5a059; background: #000; color: #fff; flex: 1;">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+            <option value="{{ cat }}" {% if current_cat == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="status" style="padding: 10px; border-radius: 4px; border: 1px solid #c5a059; background: #000; color: #fff; flex: 1;">
+        <option value="">All Statuses</option>
+        <option value="Available" {% if current_stat == 'Available' %}selected{% endif %}>Available</option>
+        <option value="Issued" {% if current_stat == 'Issued' %}selected{% endif %}>Issued</option>
+    </select>
+
+    <select name="sort" style="padding: 10px; border-radius: 4px; border: 1px solid #c5a059; background: #000; color: #fff; flex: 1;">
+        <option value="title" {% if current_sort == 'title' %}selected{% endif %}>Sort: Title (A-Z)</option>
+        <option value="author" {% if current_sort == 'author' %}selected{% endif %}>Sort: Author</option>
+    </select>
+
+    <button type="submit" class="btn" style="padding: 10px 20px;">Filter</button>
+    <a href="{{ url_for('inventory') }}" style="color: #888; text-decoration: none; font-size: 0.9em; margin-left: 10px;">Clear</a>
+</form>
 
 <table>
     <thead>
@@ -14,7 +43,7 @@
             <th>Author</th>
             <th>Category</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th class="admin-only">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -47,7 +76,7 @@
                 {% endif %}
             </td>
             
-            <td>
+            <td class="admin-only">
                 <a href="{{ url_for('edit_book', book_id=book['id']) }}" 
                    style="background-color: #c5a059; color: #000; padding: 6px 10px; text-decoration: none; border-radius: 4px; font-weight: bold; margin-right: 5px;" 
                    title="Edit">✎</a>
@@ -67,7 +96,7 @@
         {% else %}
         <tr>
             <td colspan="6" style="text-align: center; padding: 20px; color: #666;">
-                No books found. Try adding some!
+                No books match your filter.
             </td>
         </tr>
         {% endfor %}
