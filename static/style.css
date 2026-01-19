@@ -1,39 +1,179 @@
 /* =========================================
-   MOBILE RESPONSIVENESS (Phone Fixes) 
+   ATHENAVAULT MASTER THEME (Dark Royal)
+   ========================================= */
+
+/* IMPORT FONTS (Cinzel & Cormorant Garamond) */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap');
+
+body {
+    font-family: 'Cormorant Garamond', serif; /* Classy Body Font */
+    background-color: #0d0d0d; /* Very Dark Grey/Black */
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+}
+
+/* --- NAVIGATION BAR --- */
+.navbar {
+    background-color: #000000;
+    border-bottom: 1px solid #c5a059;
+    padding: 25px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Cinzel', serif;
+    color: #c5a059;
+    font-size: 1.8em;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 2px;
+}
+
+.nav-links a {
+    font-family: 'Cinzel', serif;
+    color: #b0b0b0;
+    text-decoration: none;
+    margin-left: 30px;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #c5a059;
+}
+
+/* --- DASHBOARD & HEADINGS --- */
+h1, h2 {
+    font-family: 'Cinzel', serif;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+.card-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.card {
+    background-color: #1a1a1a;
+    width: 260px;
+    padding: 40px 20px;
+    border-radius: 4px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    border: 1px solid #333;
+}
+
+.card h2 {
+    font-size: 4em;
+    margin: 0;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+}
+
+.card p {
+    color: #c5a059;
+    margin-top: 10px;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+}
+
+/* --- TABLES --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1a1a1a;
+    margin-top: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+th {
+    background-color: #252525;
+    color: #c5a059;
+    padding: 20px;
+    text-align: left;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    border-bottom: 2px solid #c5a059;
+}
+
+td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #333;
+    font-size: 1.1em;
+}
+
+/* --- BUTTONS --- */
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #c5a059;
+    color: #000;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.9em;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #e5c079;
+    letter-spacing: 1px;
+}
+
+/* --- INPUTS --- */
+input, select {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1em;
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS (The Phone Fix) 
    ========================================= */
 @media (max-width: 768px) {
 
-    /* 1. Fix the Navigation Bar */
+    /* 1. Stack the Navbar */
     .navbar {
-        flex-direction: column; /* Stack Logo on top of Links */
+        flex-direction: column;
         padding: 15px;
         text-align: center;
     }
 
     .navbar .logo {
-        font-size: 1.5em; /* Smaller Logo */
+        font-size: 1.5em;
         margin-bottom: 10px;
     }
 
     .nav-links {
         display: flex;
-        flex-direction: column; /* Stack links vertically */
+        flex-direction: column;
         gap: 10px;
         width: 100%;
     }
 
     .nav-links a {
-        margin-left: 0; /* Remove side spacing */
+        margin-left: 0;
         font-size: 0.9em;
         padding: 10px;
-        background-color: #1a1a1a; /* Add background so they look like buttons */
+        background-color: #1a1a1a;
         border-radius: 4px;
-        display: block; /* Make them full width */
+        display: block;
     }
 
-    /* 2. Fix the Big Headings */
+    /* 2. Fix Big Headings */
     h1 {
-        font-size: 2em !important; /* Force smaller title */
+        font-size: 2em !important;
         line-height: 1.2;
     }
     
@@ -41,19 +181,19 @@
         font-size: 1em !important;
     }
 
-    /* 3. Fix the Dashboard Cards */
+    /* 3. Stack Dashboard Cards */
     .card-container {
-        flex-direction: column; /* Stack cards vertically */
+        flex-direction: column;
         align-items: center;
         gap: 20px;
     }
 
     .card {
-        width: 90%; /* Use 90% of screen width */
+        width: 90%;
         margin-bottom: 10px;
     }
 
-    /* 4. Fix Forms & inputs (Add/Edit Book) */
+    /* 4. Fix Forms (Add/Edit) */
     .container {
         padding: 10px;
         width: 95%;
@@ -61,15 +201,15 @@
     
     div[style*="max-width: 600px"], 
     div[style*="max-width: 500px"] {
-        padding: 20px !important; /* Reduce padding on mobile forms */
+        padding: 20px !important;
         width: 100% !important;
         box-sizing: border-box;
     }
     
-    /* 5. Fix Tables (Inventory) for Mobile */
+    /* 5. Fix Tables (Scrollable) */
     table {
         display: block;
-        overflow-x: auto; /* Allow scrolling sideways if table is too big */
+        overflow-x: auto;
         white-space: nowrap;
     }
 }

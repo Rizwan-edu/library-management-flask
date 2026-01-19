@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
+# --- DATABASE CONNECTION HANDLER ---
 def get_db_connection():
     conn = sqlite3.connect('library.db')
     conn.row_factory = sqlite3.Row
@@ -11,177 +12,303 @@ def get_db_connection():
 
 # --- DATABASE SETUP ---
 def init_db():
-    conn = get_db_connection()
-    # Create table with ALL columns needed for the project
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS books (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            author TEXT NOT NULL,
-            category TEXT,
-            status TEXT DEFAULT 'Available',
-            borrower_name TEXT DEFAULT NULL,
-            issue_date DATE DEFAULT NULL,
-            due_date DATE DEFAULT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
+    with get_db_connection() as conn:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS books (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                author TEXT NOT NULL,
+                category TEXT,
+                status TEXT DEFAULT 'Available',
+                borrower_name TEXT DEFAULT NULL,
+                issue_date DATE DEFAULT NULL,
+                due_date DATE DEFAULT NULL
+            )
+        ''')
     seed_data()
 
+# --- 150+ BOOKS SEED DATA ---
 def seed_data():
-    conn = get_db_connection()
-    if conn.execute('SELECT count(*) FROM books').fetchone()[0] == 0:
-        # Seeding Initial Data
-        books = [
-            ('Python Crash Course', 'Eric Matthes', 'Technology'),
-            ('Clean Code', 'Robert Martin', 'Technology'),
-            ('The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction'),
-            ('1984', 'George Orwell', 'Fiction'),
-            ('A Brief History of Time', 'Stephen Hawking', 'Science'),
-            ('Sapiens', 'Yuval Noah Harari', 'History')
-        ]
-        conn.executemany('INSERT INTO books (title, author, category) VALUES (?, ?, ?)', books)
-        conn.commit()
-        print("Database seeded with initial books.")
-    conn.close()
+    with get_db_connection() as conn:
+        if conn.execute('SELECT count(*) FROM books').fetchone()[0] == 0:
+            books = [
+                # --- TECHNOLOGY & CODING ---
+                ('Python Crash Course', 'Eric Matthes', 'Technology'),
+                ('Clean Code', 'Robert Martin', 'Technology'),
+                ('The Pragmatic Programmer', 'Andrew Hunt', 'Technology'),
+                ('Introduction to Algorithms', 'Thomas H. Cormen', 'Technology'),
+                ('Design Patterns', 'Erich Gamma', 'Technology'),
+                ('You Don\'t Know JS', 'Kyle Simpson', 'Technology'),
+                ('Cracking the Coding Interview', 'Gayle Laakmann McDowell', 'Technology'),
+                ('Code Complete', 'Steve McConnell', 'Technology'),
+                ('Head First Java', 'Kathy Sierra', 'Technology'),
+                ('The Mythical Man-Month', 'Fred Brooks', 'Technology'),
+                ('Refactoring', 'Martin Fowler', 'Technology'),
+                ('Artificial Intelligence: A Modern Approach', 'Stuart Russell', 'Technology'),
+                ('Deep Learning', 'Ian Goodfellow', 'Technology'),
+                ('Automate the Boring Stuff with Python', 'Al Sweigart', 'Technology'),
+                ('Fluent Python', 'Luciano Ramalho', 'Technology'),
+                ('The Linux Command Line', 'William Shotts', 'Technology'),
+                ('Pro Git', 'Scott Chacon', 'Technology'),
+                ('Effective Java', 'Joshua Bloch', 'Technology'),
+                ('Rust Programming Language', 'Steve Klabnik', 'Technology'),
+                ('Grokking Algorithms', 'Aditya Bhargava', 'Technology'),
+
+                # --- FICTION & CLASSICS ---
+                ('The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction'),
+                ('1984', 'George Orwell', 'Fiction'),
+                ('To Kill a Mockingbird', 'Harper Lee', 'Fiction'),
+                ('Pride and Prejudice', 'Jane Austen', 'Romance'),
+                ('The Catcher in the Rye', 'J.D. Salinger', 'Fiction'),
+                ('The Alchemist', 'Paulo Coelho', 'Fiction'),
+                ('The Kite Runner', 'Khaled Hosseini', 'Fiction'),
+                ('Life of Pi', 'Yann Martel', 'Fiction'),
+                ('The Book Thief', 'Markus Zusak', 'Fiction'),
+                ('The Grapes of Wrath', 'John Steinbeck', 'Classic'),
+                ('Brave New World', 'Aldous Huxley', 'Fiction'),
+                ('Animal Farm', 'George Orwell', 'Classic'),
+                ('Lord of the Flies', 'William Golding', 'Classic'),
+                ('Jane Eyre', 'Charlotte Bronte', 'Romance'),
+                ('Wuthering Heights', 'Emily Bronte', 'Romance'),
+                ('Little Women', 'Louisa May Alcott', 'Classic'),
+                ('Moby Dick', 'Herman Melville', 'Adventure'),
+                ('War and Peace', 'Leo Tolstoy', 'Classic'),
+                ('Crime and Punishment', 'Fyodor Dostoevsky', 'Classic'),
+                ('The Brothers Karamazov', 'Fyodor Dostoevsky', 'Classic'),
+                ('Anna Karenina', 'Leo Tolstoy', 'Classic'),
+                ('Don Quixote', 'Miguel de Cervantes', 'Classic'),
+                ('Ulysses', 'James Joyce', 'Classic'),
+                ('One Hundred Years of Solitude', 'Gabriel Garcia Marquez', 'Fiction'),
+                ('The Great Expectations', 'Charles Dickens', 'Classic'),
+                ('Frankenstein', 'Mary Shelley', 'Classic'),
+                ('Dracula', 'Bram Stoker', 'Classic'),
+                ('The Picture of Dorian Gray', 'Oscar Wilde', 'Classic'),
+                ('Les Misérables', 'Victor Hugo', 'Classic'),
+                
+                # --- FANTASY & SCI-FI ---
+                ('Harry Potter and the Sorcerer\'s Stone', 'J.K. Rowling', 'Fantasy'),
+                ('Harry Potter and the Chamber of Secrets', 'J.K. Rowling', 'Fantasy'),
+                ('Harry Potter and the Prisoner of Azkaban', 'J.K. Rowling', 'Fantasy'),
+                ('The Hobbit', 'J.R.R. Tolkien', 'Fantasy'),
+                ('The Fellowship of the Ring', 'J.R.R. Tolkien', 'Fantasy'),
+                ('The Two Towers', 'J.R.R. Tolkien', 'Fantasy'),
+                ('The Return of the King', 'J.R.R. Tolkien', 'Fantasy'),
+                ('Dune', 'Frank Herbert', 'Sci-Fi'),
+                ('Ender\'s Game', 'Orson Scott Card', 'Sci-Fi'),
+                ('The Hitchhiker\'s Guide to the Galaxy', 'Douglas Adams', 'Sci-Fi'),
+                ('Fahrenheit 451', 'Ray Bradbury', 'Sci-Fi'),
+                ('The Hunger Games', 'Suzanne Collins', 'Sci-Fi'),
+                ('Catching Fire', 'Suzanne Collins', 'Sci-Fi'),
+                ('Mockingjay', 'Suzanne Collins', 'Sci-Fi'),
+                ('A Game of Thrones', 'George R.R. Martin', 'Fantasy'),
+                ('A Clash of Kings', 'George R.R. Martin', 'Fantasy'),
+                ('The Name of the Wind', 'Patrick Rothfuss', 'Fantasy'),
+                ('Ready Player One', 'Ernest Cline', 'Sci-Fi'),
+                ('The Martian', 'Andy Weir', 'Sci-Fi'),
+                ('Foundation', 'Isaac Asimov', 'Sci-Fi'),
+                ('Neuromancer', 'William Gibson', 'Sci-Fi'),
+
+                # --- MYSTERY & THRILLER ---
+                ('The Da Vinci Code', 'Dan Brown', 'Thriller'),
+                ('Angels & Demons', 'Dan Brown', 'Thriller'),
+                ('Gone Girl', 'Gillian Flynn', 'Mystery'),
+                ('The Girl with the Dragon Tattoo', 'Stieg Larsson', 'Mystery'),
+                ('Sherlock Holmes: Complete', 'Arthur Conan Doyle', 'Mystery'),
+                ('And Then There Were None', 'Agatha Christie', 'Mystery'),
+                ('Murder on the Orient Express', 'Agatha Christie', 'Mystery'),
+                ('The Silent Patient', 'Alex Michaelides', 'Thriller'),
+                ('The Woman in the Window', 'A.J. Finn', 'Thriller'),
+                ('Big Little Lies', 'Liane Moriarty', 'Mystery'),
+
+                # --- BUSINESS & ECONOMICS ---
+                ('Rich Dad Poor Dad', 'Robert Kiyosaki', 'Business'),
+                ('Think and Grow Rich', 'Napoleon Hill', 'Business'),
+                ('Zero to One', 'Peter Thiel', 'Business'),
+                ('The Lean Startup', 'Eric Ries', 'Business'),
+                ('Good to Great', 'Jim Collins', 'Business'),
+                ('Freakonomics', 'Steven Levitt', 'Economics'),
+                ('Thinking, Fast and Slow', 'Daniel Kahneman', 'Psychology'),
+                ('The Intelligent Investor', 'Benjamin Graham', 'Business'),
+                ('Principles', 'Ray Dalio', 'Business'),
+                ('Shoe Dog', 'Phil Knight', 'Biography'),
+
+                # --- HISTORY & SCIENCE ---
+                ('Sapiens: A Brief History of Humankind', 'Yuval Noah Harari', 'History'),
+                ('Homo Deus', 'Yuval Noah Harari', 'History'),
+                ('A Brief History of Time', 'Stephen Hawking', 'Science'),
+                ('Cosmos', 'Carl Sagan', 'Science'),
+                ('The Selfish Gene', 'Richard Dawkins', 'Science'),
+                ('Guns, Germs, and Steel', 'Jared Diamond', 'History'),
+                ('The Silk Roads', 'Peter Frankopan', 'History'),
+                ('1491', 'Charles C. Mann', 'History'),
+                ('Astrophysics for People in a Hurry', 'Neil deGrasse Tyson', 'Science'),
+                ('Silent Spring', 'Rachel Carson', 'Science'),
+
+                # --- BIOGRAPHY & SELF-HELP ---
+                ('Steve Jobs', 'Walter Isaacson', 'Biography'),
+                ('Elon Musk', 'Ashlee Vance', 'Biography'),
+                ('Becoming', 'Michelle Obama', 'Biography'),
+                ('The Diary of a Young Girl', 'Anne Frank', 'Biography'),
+                ('Long Walk to Freedom', 'Nelson Mandela', 'Biography'),
+                ('Wings of Fire', 'A.P.J. Abdul Kalam', 'Biography'),
+                ('Atomic Habits', 'James Clear', 'Self-Help'),
+                ('The Power of Habit', 'Charles Duhigg', 'Self-Help'),
+                ('How to Win Friends and Influence People', 'Dale Carnegie', 'Self-Help'),
+                ('Deep Work', 'Cal Newport', 'Self-Help'),
+                ('Start with Why', 'Simon Sinek', 'Self-Help'),
+                ('The 7 Habits of Highly Effective People', 'Stephen Covey', 'Self-Help'),
+                ('Can\'t Hurt Me', 'David Goggins', 'Self-Help'),
+                ('Educated', 'Tara Westover', 'Biography'),
+                ('The Subtle Art of Not Giving a F*ck', 'Mark Manson', 'Self-Help'),
+                
+                # --- COOKING & ART ---
+                ('Salt, Fat, Acid, Heat', 'Samin Nosrat', 'Cooking'),
+                ('The Joy of Cooking', 'Irma S. Rombauer', 'Cooking'),
+                ('Kitchen Confidential', 'Anthony Bourdain', 'Cooking'),
+                ('The Story of Art', 'E.H. Gombrich', 'Art'),
+                ('Ways of Seeing', 'John Berger', 'Art')
+            ]
+            conn.executemany('INSERT INTO books (title, author, category) VALUES (?, ?, ?)', books)
+            conn.commit()
+            print("LibraCore Database seeded with 150+ Books.")
 
 # --- ROUTES ---
 
 @app.route('/')
 def index():
-    # DASHBOARD: Shows Statistics
-    conn = get_db_connection()
+    with get_db_connection() as conn:
+        # Fetch Stats
+        total = conn.execute('SELECT count(*) FROM books').fetchone()[0]
+        issued = conn.execute('SELECT count(*) FROM books WHERE status="Issued"').fetchone()[0]
+        issued_list = conn.execute('SELECT * FROM books WHERE status="Issued"').fetchall()
     
-    total_books = conn.execute('SELECT count(*) FROM books').fetchone()[0]
-    issued_books = conn.execute('SELECT count(*) FROM books WHERE status="Issued"').fetchone()[0]
-    
-    # Calculate Overdue & Fines
+    # Calculate Logic
     today = datetime.now().date()
-    overdue_count = 0
-    total_fine = 0
-    issued_list = conn.execute('SELECT * FROM books WHERE status="Issued"').fetchall()
+    overdue = 0
+    fine = 0
     
     for book in issued_list:
         if book['due_date']:
             due = datetime.strptime(book['due_date'], '%Y-%m-%d').date()
             if due < today:
-                overdue_count += 1
-                days_late = (today - due).days
-                total_fine += (days_late * 10) # 10 currency units fine per day
+                overdue += 1
+                days = (today - due).days
+                fine += (days * 10)
 
-    conn.close()
+    # Translations
+    lang = request.args.get('lang', 'en')
+    text = {
+        'en': { 
+            'title': 'LibraCore Dashboard', 
+            'slogan': '"The Central Hub of Knowledge"', 
+            'total': 'Total Volumes', 
+            'borrowed': 'Currently Borrowed', 
+            'overdue': 'Overdue Books', 
+            'fines': 'Total Fines', 
+            'btn': '📚 Enter Vault & Manage Inventory' 
+        },
+        'es': { 
+            'title': 'Tablero LibraCore', 
+            'slogan': '"El Centro del Conocimiento"', 
+            'total': 'Volúmenes Totales', 
+            'borrowed': 'Actualmente Prestados', 
+            'overdue': 'Libros Vencidos', 
+            'fines': 'Multas Totales', 
+            'btn': '📚 Entrar y Gestionar Inventario' 
+        }
+    }
     
-    return render_template('index.html', 
-                           total=total_books, 
-                           issued=issued_books, 
-                           overdue=overdue_count,
-                           fine=total_fine)
+    return render_template('index.html', total=total, issued=issued, overdue=overdue, fine=fine, t=text[lang], lang=lang)
 
 @app.route('/inventory')
 def inventory():
-    conn = get_db_connection()
-    books = conn.execute('SELECT * FROM books').fetchall()
-    conn.close()
+    search_query = request.args.get('q', '')
+    with get_db_connection() as conn:
+        if search_query:
+            books = conn.execute('SELECT * FROM books WHERE title LIKE ? OR author LIKE ?', ('%' + search_query + '%', '%' + search_query + '%')).fetchall()
+        else:
+            books = conn.execute('SELECT * FROM books').fetchall()
     return render_template('inventory.html', books=books)
 
 @app.route('/add_book', methods=('GET', 'POST'))
 def add_book():
     if request.method == 'POST':
-        title = request.form['title']
-        author = request.form['author']
-        category = request.form['category']
-        conn = get_db_connection()
-        conn.execute('INSERT INTO books (title, author, category) VALUES (?, ?, ?)', (title, author, category))
-        conn.commit()
-        conn.close()
+        with get_db_connection() as conn:
+            conn.execute('INSERT INTO books (title, author, category) VALUES (?, ?, ?)', 
+                         (request.form['title'], request.form['author'], request.form['category']))
+            conn.commit()
         return redirect(url_for('inventory'))
     return render_template('add_book.html')
 
-# --- NEW: EDIT & DELETE ROUTES ---
-
 @app.route('/edit/<int:book_id>', methods=('GET', 'POST'))
 def edit_book(book_id):
-    conn = get_db_connection()
-    book = conn.execute('SELECT * FROM books WHERE id = ?', (book_id,)).fetchone()
-
-    if request.method == 'POST':
-        title = request.form['title']
-        author = request.form['author']
-        category = request.form['category']
+    with get_db_connection() as conn:
+        book = conn.execute('SELECT * FROM books WHERE id = ?', (book_id,)).fetchone()
         
-        conn.execute('UPDATE books SET title = ?, author = ?, category = ? WHERE id = ?',
-                     (title, author, category, book_id))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('inventory'))
-
-    conn.close()
+        if request.method == 'POST':
+            conn.execute('UPDATE books SET title = ?, author = ?, category = ? WHERE id = ?', 
+                         (request.form['title'], request.form['author'], request.form['category'], book_id))
+            conn.commit()
+            return redirect(url_for('inventory'))
+            
     return render_template('edit_book.html', book=book)
 
 @app.route('/delete/<int:book_id>')
 def delete_book(book_id):
-    conn = get_db_connection()
-    conn.execute('DELETE FROM books WHERE id = ?', (book_id,))
-    conn.commit()
-    conn.close()
+    with get_db_connection() as conn:
+        conn.execute('DELETE FROM books WHERE id = ?', (book_id,))
+        conn.commit()
     return redirect(url_for('inventory'))
-
-# --- ISSUE & RETURN ROUTES ---
 
 @app.route('/issue/<int:book_id>', methods=('GET', 'POST'))
 def issue_book(book_id):
     if request.method == 'POST':
         borrower = request.form['borrower']
         days = int(request.form['days'])
-        
         issue_date = datetime.now()
         due_date = issue_date + timedelta(days=days)
         
-        conn = get_db_connection()
-        conn.execute('UPDATE books SET status="Issued", borrower_name=?, issue_date=?, due_date=? WHERE id=?',
-                     (borrower, issue_date.strftime('%Y-%m-%d'), due_date.strftime('%Y-%m-%d'), book_id))
-        conn.commit()
-        conn.close()
+        with get_db_connection() as conn:
+            conn.execute('UPDATE books SET status="Issued", borrower_name=?, issue_date=?, due_date=? WHERE id=?',
+                         (borrower, issue_date.strftime('%Y-%m-%d'), due_date.strftime('%Y-%m-%d'), book_id))
+            conn.commit()
         return redirect(url_for('inventory'))
-        
     return render_template('issue_modal.html', book_id=book_id)
 
 @app.route('/issued_books')
 def issued_books():
-    conn = get_db_connection()
-    books = conn.execute('SELECT * FROM books WHERE status="Issued"').fetchall()
-    conn.close()
-    
     book_list = []
     today = datetime.now().date()
     
-    for book in books:
-        if book['due_date']:
-            due_date = datetime.strptime(book['due_date'], '%Y-%m-%d').date()
-            days_overdue = (today - due_date).days
-            fine = max(0, days_overdue * 10)
-            
-            book_list.append({
-                'id': book['id'],
-                'title': book['title'],
-                'borrower': book['borrower_name'],
-                'due_date': book['due_date'],
-                'fine': fine
-            })
+    with get_db_connection() as conn:
+        books = conn.execute('SELECT * FROM books WHERE status="Issued"').fetchall()
         
+        for book in books:
+            if book['due_date']:
+                due_date = datetime.strptime(book['due_date'], '%Y-%m-%d').date()
+                days_overdue = (today - due_date).days
+                fine = max(0, days_overdue * 10)
+                
+                book_list.append({
+                    'id': book['id'],
+                    'title': book['title'],
+                    'borrower': book['borrower_name'],
+                    'issue_date': book['issue_date'], 
+                    'due_date': book['due_date'],
+                    'fine': fine
+                })
     return render_template('issued_books.html', books=book_list)
 
 @app.route('/return/<int:book_id>')
 def return_book(book_id):
-    conn = get_db_connection()
-    conn.execute('UPDATE books SET status="Available", borrower_name=NULL, issue_date=NULL, due_date=NULL WHERE id=?', (book_id,))
-    conn.commit()
-    conn.close()
+    with get_db_connection() as conn:
+        conn.execute('UPDATE books SET status="Available", borrower_name=NULL, issue_date=NULL, due_date=NULL WHERE id=?', (book_id,))
+        conn.commit()
     return redirect(url_for('issued_books'))
 
-# --- APP STARTUP ---
+# Initialize DB
 init_db()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # SECURITY FIX: Debug mode disabled for production simulation
+    app.run(debug=False)

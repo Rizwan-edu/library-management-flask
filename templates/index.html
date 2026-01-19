@@ -1,44 +1,87 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="text-align: center; margin-bottom: 60px; margin-top: 20px;">
-    <h1 style="color: #c5a059; font-size: 3.5em; font-family: 'Cinzel', serif; font-weight: 700; margin-bottom: 10px;">
-        AthenaVault Dashboard
+<div style="text-align: center; margin-bottom: 40px; margin-top: 20px; position: relative;">
+    
+    <div style="position: absolute; top: 0; right: 0;">
+        <a href="/?lang=en" style="text-decoration: none; font-size: 1.5em; opacity: {{ '1' if lang == 'en' else '0.5' }};" title="English">🇬🇧</a>
+        <a href="/?lang=es" style="text-decoration: none; font-size: 1.5em; opacity: {{ '1' if lang == 'es' else '0.5' }};" title="Spanish">🇪🇸</a>
+    </div>
+
+    <h1 style="color: #c5a059; font-size: 3.5em; font-family: 'Cinzel', serif; font-weight: 700;">
+        {{ t.title }}
     </h1>
     <p style="color: #b0b0b0; font-style: italic; font-size: 1.4em; font-family: 'Cormorant Garamond', serif;">
-        "The Guardian of Wisdom"
+        {{ t.slogan }}
     </p>
+
+    <div style="margin-top: 30px;">
+        <input type="text" id="voiceInput" placeholder="Click mic to search..." 
+               style="padding: 10px; width: 300px; border-radius: 20px; border: 1px solid #c5a059; background: #1a1a1a; color: white; text-align: center;">
+        <button onclick="startVoiceSearch()" style="background: none; border: none; cursor: pointer; font-size: 1.5em; vertical-align: middle;">
+            🎤
+        </button>
+        <button onclick="window.location.href='/inventory?q=' + document.getElementById('voiceInput').value" 
+                style="background: #c5a059; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 5px;">
+            Go
+        </button>
+    </div>
 </div>
 
 <div class="card-container">
-    
-    <div class="card" style="border-top: 4px solid #4a69bd;"> <h2>{{ total }}</h2>
-        <p>Total Volumes</p>
+    <div class="card" style="border-top: 4px solid #4a69bd;">
+        <h2>{{ total }}</h2>
+        <p>{{ t.total }}</p>
     </div>
 
-    <div class="card" style="border-top: 4px solid #c5a059;"> <h2>{{ issued }}</h2>
-        <p>Currently Borrowed</p>
+    <div class="card" style="border-top: 4px solid #c5a059;">
+        <h2>{{ issued }}</h2>
+        <p>{{ t.borrowed }}</p>
     </div>
 
-    <div class="card" style="border-top: 4px solid #e74c3c;"> <h2>{{ overdue }}</h2>
-        <p>Overdue Books</p>
-        
+    <div class="card" style="border-top: 4px solid #e74c3c;">
+        <h2>{{ overdue }}</h2>
+        <p>{{ t.overdue }}</p>
         {% if fine > 0 %}
             <p style="color: #ff6b6b; font-weight: bold; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
-                Total Fines: ${{ fine }}
+                {{ t.fines }}: ${{ fine }}
             </p>
         {% else %}
-            <p style="color: #2ecc71; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
+             <p style="color: #2ecc71; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
                 No Outstanding Fines
             </p>
         {% endif %}
     </div>
-
 </div>
 
 <div style="text-align: center; margin-top: 70px;">
     <a href="{{ url_for('inventory') }}" class="btn">
-        📚 Enter Vault & Manage Inventory
+        {{ t.btn }}
     </a>
 </div>
+
+<script>
+    function startVoiceSearch() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert("Sorry, your browser doesn't support Voice Search. Try Chrome!");
+            return;
+        }
+
+        var recognition = new webkitSpeechRecognition();
+        recognition.lang = "en-US";
+        recognition.start();
+
+        document.getElementById("voiceInput").placeholder = "Listening...";
+
+        recognition.onresult = function(event) {
+            var transcript = event.results[0][0].transcript;
+            document.getElementById("voiceInput").value = transcript;
+            window.location.href = '/inventory?q=' + transcript;
+        };
+
+        recognition.onerror = function(event) {
+            document.getElementById("voiceInput").placeholder = "Error. Try again.";
+        };
+    }
+</script>
 {% endblock %}
